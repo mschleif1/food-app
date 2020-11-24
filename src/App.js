@@ -13,30 +13,29 @@ function App() {
   const [rests, setRests] = useState(null);
   const [city, setCity] = useState(null);
   const [cuisines, setCuisines] = useState([]);
+  const [search, setSearch] = useState(false);
 
   const cuisineHash = {};
   const axios = require("axios");
 
-  //sets the
-  const searchForCity = (city, cuisines) => {
+  //Is intended to search for and update data.
+  const updateData = (searchCity, searchCuisines) => {
     const CITY_URL = "https://developers.zomato.com/api/v2.1/cities?q=";
 
-    setCuisines(cuisines);
-
-    axios.get(CITY_URL + city, { headers: { "user-key": API_KEY } }).then((response) => {
+    axios.get(CITY_URL + searchCity, { headers: { "user-key": API_KEY } }).then((response) => {
+      debugger;
       if (response.data.location_suggestions.length > 0) {
+        console.log("i got here");
         setCity(response.data.location_suggestions[0]);
+        setSearch((prev) => !prev);
+        setCuisines(searchCuisines);
       }
     });
   };
 
-  useEffect(() => {}, []);
-
-  console.log("i rerenderd");
   const createSearchUrl = () => {
     table.forEach((entry) => {
       cuisineHash[entry.cuisine_name] = entry.cuisine_id;
-      console.log("Cuisine Hash created");
     });
 
     const baseURL = "https://developers.zomato.com/api/v2.1/search?entity_id=";
@@ -45,37 +44,32 @@ function App() {
       if (cuisines.length === 1) cuisineString = cuisineHash[cuisines[0].label];
       else {
         cuisines.forEach((id, idx) => {
-          console.log(cuisineHash);
-          console.log(id.label);
-          console.log(cuisineHash[id.label]);
           cuisineString += cuisineHash[id.label] + "%";
           if (idx < cuisines.length - 1) cuisineString += "2C";
         });
       }
       return `${baseURL + city.id}&entity_type=city&cuisines=${cuisineString}`;
+    } else {
+      return `${baseURL + city.id}&entity_type=city`;
     }
   };
-  //useEffect that displays the results. Runs whenever the searched city is changed by
-  //searchForCity
+
   useEffect(() => {
+    debugger;
     if (city) {
-      const thing = createSearchUrl();
       axios
-        .get(
-          "https://developers.zomato.com/api/v2.1/search?entity_id=" + city.id + "&entity_type=city" + "&cuisines=",
-          {
-            headers: { "user-key": API_KEY },
-          }
-        )
+        .get(createSearchUrl(), {
+          headers: { "user-key": API_KEY },
+        })
         .then((response) => {
           setRests(response.data.restaurants);
         });
     }
-  }, [city]);
+  }, [search]);
 
   const body = rests ? (
     <div>
-      <Query searchForCity={searchForCity} hello={10} />
+      <Query updateData={updateData} />
       <div className="card-group">
         {rests.map((rest) => (
           <Card rest={rest.restaurant} className="card" />
@@ -84,7 +78,7 @@ function App() {
     </div>
   ) : (
     <div>
-      <Query searchForCity={searchForCity} />
+      <Query updateData={updateData} />
       <span>I'm fucking loading, chill.</span>
     </div>
   );
@@ -94,7 +88,7 @@ function App() {
   } else
     return (
       <div>
-        <Query searchForCity={searchForCity} />
+        <Query updateData={updateData} />
         <br></br>
         <span>Enter a your city to get searching!</span>
       </div>

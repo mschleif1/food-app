@@ -4,7 +4,7 @@ import "@elastic/eui/dist/eui_theme_light.css";
 import { EuiFlexGroup, EuiFlexItem, EuiButton, EuiFormRow, EuiFieldText, EuiComboBox } from "@elastic/eui";
 import { labels, table } from "./CuisineList";
 
-export default ({ searchForCity }) => {
+export default ({ updateData }) => {
   const [search, setSearch] = useState(null);
   const [selectedCuisines, setSelectedCuisines] = useState([]);
 
@@ -18,8 +18,7 @@ export default ({ searchForCity }) => {
 
   const handleSubmit = () => {
     if (search) {
-      searchForCity(search, selectedCuisines);
-      setSearch(null);
+      updateData(search, selectedCuisines);
     } else window.alert("Enter a city to search.");
   };
   return (
