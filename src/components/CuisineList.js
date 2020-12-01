@@ -293,3 +293,9 @@ export const table = [
     cuisine_name: "Vietnamese",
   },
 ];
+
+export const sortOptions = [
+  { value: 0, text: "Sort by rating" },
+  { value: 1, text: "Sort by most expensive" },
+  { value: 2, text: "Sort by cheapest" },
+];

@@ -14,21 +14,25 @@ function App() {
   const [city, setCity] = useState(null);
   const [cuisines, setCuisines] = useState([]);
   const [search, setSearch] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initial, setInitial] = useState(true);
+  const [sortBy, setSortBy] = useState(0);
 
   const cuisineHash = {};
   const axios = require("axios");
 
   //Is intended to search for and update data.
-  const updateData = (searchCity, searchCuisines) => {
+  const updateData = (searchCity, searchCuisines, sortOption) => {
+    setLoading(true);
     const CITY_URL = "https://developers.zomato.com/api/v2.1/cities?q=";
 
     axios.get(CITY_URL + searchCity, { headers: { "user-key": API_KEY } }).then((response) => {
-      debugger;
       if (response.data.location_suggestions.length > 0) {
-        console.log("i got here");
         setCity(response.data.location_suggestions[0]);
-        setSearch((prev) => !prev);
         setCuisines(searchCuisines);
+        setSortBy(sortOption);
+        setSearch((prev) => !prev);
+        if (initial) setInitial(false);
       }
     });
   };
@@ -39,6 +43,24 @@ function App() {
     });
 
     const baseURL = "https://developers.zomato.com/api/v2.1/search?entity_id=";
+
+    let sortString = "";
+
+    //Sort by highest rated
+    if (sortBy === 0) {
+      sortString = "&sort=rating&order=desc";
+    }
+
+    //Sort by most expensive
+    else if (sortBy === 1) {
+      sortString = "&sort=cost&order=desc";
+    }
+
+    //Sort by the cheapest
+    else {
+      sortString = "&sort=cost&order=asc";
+    }
+
     if (cuisines.length > 0) {
       let cuisineString = "";
       if (cuisines.length === 1) cuisineString = cuisineHash[cuisines[0].label];
@@ -48,14 +70,13 @@ function App() {
           if (idx < cuisines.length - 1) cuisineString += "2C";
         });
       }
-      return `${baseURL + city.id}&entity_type=city&cuisines=${cuisineString}`;
+      return `${baseURL + city.id}&entity_type=city&cuisines=${cuisineString}${sortString}`;
     } else {
-      return `${baseURL + city.id}&entity_type=city`;
+      return `${baseURL + city.id}&entity_type=city${sortString}`;
     }
   };
 
   useEffect(() => {
-    debugger;
     if (city) {
       axios
         .get(createSearchUrl(), {
@@ -63,28 +84,33 @@ function App() {
         })
         .then((response) => {
           setRests(response.data.restaurants);
+          setLoading(false);
         });
     }
   }, [search]);
 
-  const body = rests ? (
-    <div>
-      <Query updateData={updateData} />
-      <div className="card-group">
-        {rests.map((rest) => (
-          <Card rest={rest.restaurant} className="card" />
-        ))}
+  const body =
+    !loading && rests ? (
+      <div>
+        <div className="card-group">
+          {rests.map((rest) => (
+            <Card rest={rest.restaurant} className="card" />
+          ))}
+        </div>
       </div>
-    </div>
-  ) : (
-    <div>
-      <Query updateData={updateData} />
-      <span>I'm fucking loading, chill.</span>
-    </div>
-  );
+    ) : (
+      <div>
+        <span>I'm fucking loading, chill.</span>
+      </div>
+    );
 
-  if (city) {
-    return body;
+  if (!initial) {
+    return (
+      <div>
+        <Query updateData={updateData} />
+        {body}
+      </div>
+    );
   } else
     return (
       <div>
