@@ -22,41 +22,49 @@ export default ({ updateData }) => {
       updateData(search, selectedCuisines, selectedSort);
     } else window.alert("Enter a city to search.");
   };
+
   return (
     <div style={{ width: "75%", margin: "auto" }}>
-      <EuiFlexGroup style={{ maxWidth: 600 }}>
-        <EuiFlexItem>
+      <EuiFlexGroup style={{ maxWidth: 1200 }}>
+        <EuiFlexItem style={{ width: 400 }}>
           <EuiFormRow
             onChange={(e) => {
               handleChange(e);
             }}
-            label="City"
             value={search}
-            helpText="Enter a city name to start searching"
           >
-            <EuiFieldText />
+            <EuiFieldText placeholder="Enter a city" />
           </EuiFormRow>
         </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiFormRow hasEmptyLabelSpace>
-            <EuiButton onClick={handleSubmit}>Search</EuiButton>
+
+        <EuiFlexItem style={{ width: 400 }}>
+          <EuiComboBox
+            placeholder="Select cuisine options"
+            options={labels}
+            selectedOptions={selectedCuisines}
+            onChange={onChange}
+            isClearable={true}
+            data-test-subj="demoComboBox"
+          />
+        </EuiFlexItem>
+
+        <EuiFlexItem style={{ width: 300 }}>
+          <EuiSelect
+            options={sortOptions}
+            value={selectedSort}
+            onChange={(e) => setSelectedSort(parseInt(e.target.value))}
+            aria-label="Use aria labels when no actual label is in use"
+          />
+        </EuiFlexItem>
+
+        <EuiFlexItem style={{ width: 200 }}>
+          <EuiFormRow>
+            <EuiButton fill onClick={handleSubmit}>
+              Search
+            </EuiButton>
           </EuiFormRow>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiComboBox
-        placeholder="Select cuisine options"
-        options={labels}
-        selectedOptions={selectedCuisines}
-        onChange={onChange}
-        isClearable={true}
-        data-test-subj="demoComboBox"
-      />
-      <EuiSelect
-        options={sortOptions}
-        value={selectedSort}
-        onChange={(e) => setSelectedSort(parseInt(e.target.value))}
-        aria-label="Use aria labels when no actual label is in use"
-      />
     </div>
   );
 };

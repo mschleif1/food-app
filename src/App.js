@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useState } from "react";
 import Card from "./components/Card";
 import Query from "./components/Query";
-
+import Header from "./components/Header";
 import { labels, table } from "./components/CuisineList";
 
 import "./App.css";
@@ -107,14 +107,20 @@ function App() {
   if (!initial) {
     return (
       <div>
-        <Query updateData={updateData} />
-        {body}
+        <Header />
+        <div className="pizza-header">
+          <Query updateData={updateData} />
+        </div>
+        <div className="card-div">{body}</div>
       </div>
     );
   } else
     return (
       <div>
-        <Query updateData={updateData} />
+        <Header />
+        <div className="pizza-header">
+          <Query updateData={updateData} />
+        </div>
         <br></br>
         <span>Enter a your city to get searching!</span>
       </div>
