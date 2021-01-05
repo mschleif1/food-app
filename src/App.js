@@ -3,7 +3,9 @@ import { useState } from "react";
 import Card from "./components/Card";
 import Query from "./components/Query";
 import Header from "./components/Header";
-import { labels, table } from "./components/CuisineList";
+import { table } from "./components/CuisineList";
+
+import { EuiLoadingSpinner } from "@elastic/eui";
 
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -99,8 +101,8 @@ function App() {
         </div>
       </div>
     ) : (
-      <div>
-        <span>I'm fucking loading, chill.</span>
+      <div className="loading-page">
+        <EuiLoadingSpinner size="xl" />
       </div>
     );
 
@@ -121,8 +123,12 @@ function App() {
         <div className="pizza-header">
           <Query updateData={updateData} />
         </div>
-        <br></br>
-        <span>Enter a your city to get searching!</span>
+        <div className="empty-search">
+          Nothing here.
+          <br></br>
+          <br></br>
+          Enter a city to start searching!
+        </div>
       </div>
     );
 }
